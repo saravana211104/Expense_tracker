@@ -1,5 +1,7 @@
-from datetime import datetime
 import mysql.connector
+import pandas as pd
+from datetime import datetime
+import matplotlib.pyplot as plt
 
 #Database Connection with Error Handling
 try:
@@ -13,6 +15,7 @@ try:
 except mysql.connector.Error as e:
     print("Database Connection Error:", e)
     exit()
+
 
 #Input Validation Functions
 def get_valid_date(prompt):
@@ -95,6 +98,20 @@ def delete_expense():
     conn.commit()
     print("Expense Deleted!")
 
+
+def export_to_excel():
+    cursor.execute("SELECT * FROM expenses")
+    data = cursor.fetchall()
+    if not data:
+        print("No data to export!")
+        return
+
+    columns = [desc[0] for desc in cursor.description]
+    df = pd.DataFrame(data, columns=columns)
+    df.to_excel("expense_report.xlsx", index=False)
+    print("Excel Report Generated: expense_report.xlsx")
+
+
 # Summary / Analytics Feature
 def summary_report():
     cursor.execute("SELECT SUM(amount) FROM expenses")
@@ -152,8 +169,50 @@ def search_by_date_range():
         for row in result:
             print(row)
 
+def category_chart():
+    cursor.execute("SELECT category, SUM(amount) FROM expenses GROUP BY category")
+    result = cursor.fetchall()
+
+    if not result:
+        print(" No data to plot!")
+        return
+
+    categories = [row[0] for row in result]
+    totals = [row[1] for row in result]
+
+    plt.figure()
+    plt.bar(categories, totals)
+    plt.xlabel("Category")
+    plt.ylabel("Total Amount (₹)")
+    plt.title("Category-wise Expense Report")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
 
+def monthly_chart():
+    cursor.execute("""
+        SELECT DATE_FORMAT(date, '%Y-%m') AS month,
+        SUM(amount) FROM expenses
+        GROUP BY month ORDER BY month
+    """)
+    result = cursor.fetchall()
+
+    if not result:
+        print("⚠ No data to display!")
+        return
+
+    months = [row[0] for row in result]
+    totals = [row[1] for row in result]
+
+    plt.figure()
+    plt.plot(months, totals, marker='o')
+    plt.xlabel("Month")
+    plt.ylabel("Total Expense (₹)")
+    plt.title("Monthly Expense Trend")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
 # Main Menu
 def menu():
@@ -168,8 +227,9 @@ def menu():
         print("7. Search by Date")
         print("8. Search by Category")
         print("9. Search by Date Range")
-        print("10. Exit")
-
+        print("10. Category Chart")
+        print("11. Monthly Trend Chart")
+        print("12. Exit")
 
         choice = input("Enter choice: ")
 
@@ -181,7 +241,7 @@ def menu():
             update_expense()
         elif choice == "4":
             delete_expense()
-         elif choice == "5":
+        elif choice == "5":
             export_to_excel()
         elif choice == "6":
             summary_report()
@@ -191,14 +251,17 @@ def menu():
             search_by_category()
         elif choice == "9":
             search_by_date_range()
-
         elif choice == "10":
+            category_chart()
+        elif choice == "11":
+            monthly_chart()
+        elif choice == "12":
             cursor.close()
             conn.close()
             print("Goodbye!")
             break        
         else:
-            print("Invalid choice! Enter number 1-5")
+            print("Invalid choice! Enter number 1-7")
 
 
 
