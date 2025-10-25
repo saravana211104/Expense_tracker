@@ -1,3 +1,5 @@
+
+
 #Input Validation Functions
 def get_valid_date(prompt):
     while True:
@@ -78,6 +80,23 @@ def delete_expense():
                    (expense_id,))
     conn.commit()
     print("Expense Deleted!")
+
+# Summary / Analytics Feature
+def summary_report():
+    cursor.execute("SELECT SUM(amount) FROM expenses")
+    total = cursor.fetchone()[0]
+    total = total if total else 0
+
+    print("\n Expense Summary:")
+    print(f" Total Expense: ₹{total:.2f}")
+
+    cursor.execute("SELECT category, SUM(amount) FROM expenses GROUP BY category")
+    result = cursor.fetchall()
+    if result:
+        print("\nCategory Wise Expense:")
+        for category, amt in result:
+            print(f"- {category}: ₹{amt:.2f}")
+
 
 
 # Main Menu
