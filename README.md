@@ -58,7 +58,6 @@ How to Run the Project
 4)python expense_tracker.py:
 
 5)Project Folder Structure:
-  
    Expense-Tracker:
    expense_tracker.py
    generated_reports (Excel files saved here)
