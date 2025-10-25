@@ -1,5 +1,18 @@
 from datetime import datetime
+import mysql.connector
 
+#Database Connection with Error Handling
+try:
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="expense_db"
+    )
+    cursor = conn.cursor()
+except mysql.connector.Error as e:
+    print("Database Connection Error:", e)
+    exit()
 
 #Input Validation Functions
 def get_valid_date(prompt):
@@ -150,7 +163,13 @@ def menu():
         print("2. View Expenses")
         print("3. Update Expense")
         print("4. Delete Expense")
-        print("5. Exit")
+        print("5. Export to Excel")
+        print("6. Expense Summary")
+        print("7. Search by Date")
+        print("8. Search by Category")
+        print("9. Search by Date Range")
+        print("10. Exit")
+
 
         choice = input("Enter choice: ")
 
@@ -162,7 +181,18 @@ def menu():
             update_expense()
         elif choice == "4":
             delete_expense()
-        elif choice == "5":
+         elif choice == "5":
+            export_to_excel()
+        elif choice == "6":
+            summary_report()
+        elif choice == "7":
+            search_by_date()
+        elif choice == "8":
+            search_by_category()
+        elif choice == "9":
+            search_by_date_range()
+
+        elif choice == "10":
             cursor.close()
             conn.close()
             print("Goodbye!")
