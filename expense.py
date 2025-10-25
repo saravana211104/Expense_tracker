@@ -1,3 +1,4 @@
+from datetime import datetime
 
 
 #Input Validation Functions
@@ -96,6 +97,48 @@ def summary_report():
         print("\nCategory Wise Expense:")
         for category, amt in result:
             print(f"- {category}: ₹{amt:.2f}")
+
+def search_by_date():
+    date = get_valid_date("Enter date (YYYY-MM-DD) to search: ")
+    cursor.execute("SELECT * FROM expenses WHERE date=%s", (date,))
+    result = cursor.fetchall()
+
+    if not result:
+        print(" No expenses found on this date.")
+    else:
+        for row in result:
+            print(row)
+
+
+def search_by_category():
+    category = input("Enter category name: ")
+    cursor.execute("SELECT * FROM expenses WHERE category LIKE %s", (f"%{category}%",))
+    result = cursor.fetchall()
+
+    if not result:
+        print(" No expenses found in this category.")
+    else:
+        for row in result:
+            print(row)
+
+
+def search_by_date_range():
+    print("Enter date range:")
+    start_date = get_valid_date("From (YYYY-MM-DD): ")
+    end_date = get_valid_date("To (YYYY-MM-DD): ")
+
+    cursor.execute(
+        "SELECT * FROM expenses WHERE date BETWEEN %s AND %s ORDER BY date ASC",
+        (start_date, end_date)
+    )
+    result = cursor.fetchall()
+
+    if not result:
+        print(" No expenses found in this range.")
+    else:
+        for row in result:
+            print(row)
+
 
 
 
