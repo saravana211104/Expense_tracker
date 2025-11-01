@@ -261,7 +261,7 @@ def menu():
             print("Goodbye!")
             break        
         else:
-            print("Invalid choice! Enter number 1-7")
+            print("Invalid choice! Enter number 1-12")
 
 
 
